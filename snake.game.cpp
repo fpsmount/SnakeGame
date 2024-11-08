@@ -4,143 +4,187 @@
 
 using namespace std;
 
-bool gameover;
-const int width = 20;
-const int height = 10;
-int x, y, fruitX, fruitY, score;
-int tailX[100], tailY[100];
-int nTail;
-enum eDirecton { STOP = 0, LEFT, RIGHT, UP, DOWN };
-eDirecton dir;
+bool fimdejogo;
+const int largura = 20;
+const int altura = 10;
+int x, y, frutaX, frutaY, pontuacao;
+int caudaX[100], caudaY[100];
+int nCauda;
+enum eDirecao { PARAR = 0, ESQUERDA, DIREITA, CIMA, BAIXO };
+eDirecao dir;
 
-void Setup() {
-    gameover = false;
-    dir = STOP;
-    x = width / 2;
-    y = height / 2;
-    fruitX = rand() % width;
-    fruitY = rand() % height;
-    score = 0;
+void Configurar() {
+    fimdejogo = false;
+    dir = PARAR;
+    x = largura / 2;
+    y = altura / 2;
+    frutaX = rand() % largura;
+    frutaY = rand() % altura;
+    pontuacao = 0;
+    nCauda = 0;
 }
 
-void Draw() {
+void Desenhar() {
     system("cls");
-    for (int i = 0; i < width + 2; i++)
+    for (int i = 0; i < largura + 2; i++)
         cout << "#";
     cout << endl;
 
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
+    for (int i = 0; i < altura; i++) {
+        for (int j = 0; j < largura; j++) {
             if (j == 0)
                 cout << "#"; 
             if (i == y && j == x)
                 cout << "O"; 
-            else if (i == fruitY && j == fruitX)
+            else if (i == frutaY && j == frutaX)
                 cout << "F"; 
             else {
-                bool printTail = false;
-                for (int k = 0; k < nTail; k++) {
-                    if (tailX[k] == j && tailY[k] == i) {
+                bool imprimirCauda = false;
+                for (int k = 0; k < nCauda; k++) {
+                    if (caudaX[k] == j && caudaY[k] == i) {
                         cout << "o"; 
-                        printTail = true;
+                        imprimirCauda = true;
                     }
                 }
-                if (!printTail)
+                if (!imprimirCauda)
                     cout << " ";
             }
 
-            if (j == width - 1)
+            if (j == largura - 1)
                 cout << "#"; 
         }
         cout << endl;
     }
 
-    for (int i = 0; i < width + 2; i++)
+    for (int i = 0; i < largura + 2; i++)
         cout << "#";
     cout << endl;
-    cout << "Score:" << score << endl;
+    cout << "Pontuação: " << pontuacao << endl;
 }
 
-void Input() {
+void Entrada() {
     if (_kbhit()) {
         switch (_getch()) {
             case 'a':
-                dir = LEFT;
+                dir = ESQUERDA;
                 break;
             case 'd':
-                dir = RIGHT;
+                dir = DIREITA;
                 break;
             case 'w':
-                dir = UP;
+                dir = CIMA;
                 break;
             case 's':
-                dir = DOWN;
+                dir = BAIXO;
                 break;
             case 'x':
-                gameover = true;
+                fimdejogo = true;
                 break;
         }
     }
 }
 
-void Algorithm() {
-    int prevX = tailX[0];
-    int prevY = tailY[0];
+void Algoritmo() {
+    int prevX = caudaX[0];
+    int prevY = caudaY[0];
     int prev2X, prev2Y;
-    tailX[0] = x;
-    tailY[0] = y;
+    caudaX[0] = x;
+    caudaY[0] = y;
 
-    for (int i = 1; i < nTail; i++) {
-        prev2X = tailX[i];
-        prev2Y = tailY[i];
-        tailX[i] = prevX;
-        tailY[i] = prevY;
+    for (int i = 1; i < nCauda; i++) {
+        prev2X = caudaX[i];
+        prev2Y = caudaY[i];
+        caudaX[i] = prevX;
+        caudaY[i] = prevY;
         prevX = prev2X;
         prevY = prev2Y;
     }
 
     switch (dir) {
-        case LEFT:
+        case ESQUERDA:
             x--;
             break;
-        case RIGHT:
+        case DIREITA:
             x++;
             break;
-        case UP:
+        case CIMA:
             y--;
             break;
-        case DOWN:
+        case BAIXO:
             y++;
             break;
         default:
             break;
     }
 
-    if (x < 0 || x >= width || y < 0 || y >= height)
-        gameover = true;
+    if (x < 0 || x >= largura || y < 0 || y >= altura)
+        fimdejogo = true;
 
-    for (int i = 0; i < nTail; i++) {
-        if (tailX[i] == x && tailY[i] == y)
-            gameover = true;
+    for (int i = 0; i < nCauda; i++) {
+        if (caudaX[i] == x && caudaY[i] == y)
+            fimdejogo = true;
     }
 
-    if (x == fruitX && y == fruitY) {
-        score += 10;
-        fruitX = rand() % width;
-        fruitY = rand() % height;
-        nTail++;
+    if (x == frutaX && y == frutaY) {
+        pontuacao += 10;
+        frutaX = rand() % largura;
+        frutaY = rand() % altura;
+        nCauda++;
+    }
+}
+
+void TelaInicial() {
+    system("cls");
+    cout << "=======================" << endl;
+    cout << "      JOGO DA CEBOLINHA       " << endl;
+    cout << "=======================" << endl;
+    cout << "\nPressione 'ENTER' para começar o jogo." << endl;
+    cout << "\nInstruções:" << endl;
+    cout << "1. Use 'W' para mover para cima." << endl;
+    cout << "2. Use 'A' para mover para a esquerda." << endl;
+    cout << "3. Use 'S' para mover para baixo." << endl;
+    cout << "4. Use 'D' para mover para a direita." << endl;
+    cout << "5. Colete as frutas (F) para pontuar." << endl;
+    cout << "6. Evite bater nas paredes ou na sua própria cauda." << endl;
+    cout << "\nBoa sorte!" << endl;
+    cout << "\nPressione 'ENTER' para começar..." << endl;
+    while (_kbhit()) _getch(); 
+    while (_getch() != 13); 
+}
+
+void TelaGameOver() {
+    system("cls");
+    cout << "=======================" << endl;
+    cout << "       FIM DE JOGO       " << endl;
+    cout << "=======================" << endl;
+    cout << "\nSua pontuação: " << pontuacao << endl;
+    cout << "\nPressione 'R' para reiniciar ou 'Q' para sair." << endl;
+
+    while (_kbhit()) _getch(); 
+    char escolha = _getch();
+    if (escolha == 'r' || escolha == 'R') {
+        Configurar();
+        return; 
+    } else if (escolha == 'q' || escolha == 'Q') {
+        fimdejogo = true;
     }
 }
 
 int main() {
-    Setup();
+    TelaInicial();
 
-    while (!gameover) {
-        Draw();
-        Input();
-        Algorithm();
-        Sleep(10);
-    }
+    do {
+        Configurar();
+        while (!fimdejogo) {
+            Desenhar();
+            Entrada();
+            Algoritmo();
+            Sleep(10);
+        }
+
+        TelaGameOver(); 
+
+    } while (!fimdejogo); 
 
     return 0;
 }
